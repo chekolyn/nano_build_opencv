@@ -7,6 +7,7 @@ set -e
 readonly PREFIX=/usr/local  # install prefix, (can be ~/.local for a user install)
 readonly DEFAULT_VERSION=4.4.0  # controls the default version (gets reset by the first argument)
 readonly CPUS=$(nproc)  # controls the number of jobs
+readonly BUILD_TMP=/tmp/build_opencv
 
 # better board detection. if it has 6 or more cpus, it probably has a ton of ram too
 if [[ $CPUS -gt 5 ]]; then
@@ -18,19 +19,30 @@ else
 fi
 
 cleanup () {
-# https://stackoverflow.com/questions/226703/how-do-i-prompt-for-yes-no-cancel-input-in-a-linux-shell-script
-    while true ; do
-        echo "Do you wish to remove temporary build files in /tmp/build_opencv ? "
-        if ! [[ "$1" -eq "--test-warning" ]] ; then
-            echo "(Doing so may make running tests on the build later impossible)"
-        fi
-        read -p "Y/N " yn
-        case ${yn} in
-            [Yy]* ) rm -rf /tmp/build_opencv ; break;;
-            [Nn]* ) exit ;;
-            * ) echo "Please answer yes or no." ;;
-        esac
-    done
+    echo "REMOVING build files"
+    rm -rf ${BUILD_TMP}
+
+    # echo "REMOVING build dependencies"
+    # apt-get purge -y --autoremove \
+    #     gosu \
+    #     build-essential \
+    #     ca-certificates \
+    #     cmake \
+    #     git \
+    #     cuda-compiler-10-2 \
+    #     cuda-minimal-build-10-2 \
+    #     cuda-libraries-dev-10-2 \
+    #     libcudnn8-dev \
+    #     python3-dev
+    # there are probably more -dev packages that can be removed if the
+    # runtime packages are explicitly added below in install_dependencies
+    # but the above ones I know offhand can be removed without breaking open_cv
+    # TODO(mdegans): separate more build and runtime deps, purge build deps
+
+    # this shaves about 20Mb off the image
+    echo "REMOVING apt cache and lists"
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
 }
 
 setup () {
@@ -174,7 +186,7 @@ main () {
         sudo make install 2>&1 | tee -a install.log
     fi
 
-    cleanup --test-warning
+    echo "y" | cleanup --test-warning
 
 }
 
