@@ -63,9 +63,8 @@ install_dependencies () {
         libatlas-base-dev \
         libavcodec-dev \
         libavformat-dev \
-        libavresample-dev \
         libcanberra-gtk3-module \
-        libdc1394-22-dev \
+        libdc1394-dev \
         libeigen3-dev \
         libglew-dev \
         libgstreamer-plugins-base1.0-dev \
@@ -90,8 +89,6 @@ install_dependencies () {
         libxvidcore-dev \
         libx264-dev \
         pkg-config \
-        python-dev \
-        python-numpy \
         python3-dev \
         python3-numpy \
         python3-matplotlib \
@@ -111,7 +108,7 @@ configure () {
         -D CUDA_ARCH_PTX=
         -D CUDA_FAST_MATH=ON
         -D CUDNN_VERSION='8.0'
-        -D EIGEN_INCLUDE_PATH=/usr/include/eigen3 
+        -D EIGEN_INCLUDE_PATH=/usr/include/eigen3
         -D ENABLE_NEON=ON
         -D OPENCV_DNN_CUDA=ON
         -D OPENCV_ENABLE_NONFREE=ON
